@@ -9,7 +9,7 @@ const ROLE = 'UPGRADER';
 
 module.exports = {
 	spawn: function(spawn) {
-		spawn.spawnCreep([WORK,CARRY,MOVE,MOVE],
+		spawn.spawnCreep([WORK,WORK,CARRY,MOVE],
 			ROLE + Game.time.toString(),
 			{ memory: {
 				role: ROLE,
@@ -21,21 +21,10 @@ module.exports = {
 	},
 	
 	run: function(creep) {
-		switch(creep.memory.task) {
-			case null:
+		if ( creep.memory.task == null ) {
 				determineTask(creep);
-				break;
-			case MOVING:
-				creepBasic.move(creep);
-				break;
-			case COLLECTING:
-				creepBasic.collectEnergy(creep);
-				break;
-			case UPGRADING:
-				creepBasic.upgrade(creep);
-				break;
-			default:
 		}
+		creepBasic.performTask(creep);
 	},
 };
 
@@ -47,7 +36,7 @@ function determineTask(creep) {
 		return;
 	}
 
-	let closestController = Game.spawns.Spawn1.room.controller /* TODO This needs to be the spawn the creep is assigned */
+	let closestController = Game.spawns.Spawn1.room.controller;
 	// If you're near the controller upgrade it
 	if ( creep.pos.inRangeTo(closestController, 2) ) {
 		memory.task = UPGRADING;
@@ -57,7 +46,7 @@ function determineTask(creep) {
 	} else {
 		memory.task = MOVING;
 		memory.target = closestController.id;
-		memory.range = 2
+		memory.range = 2;
 		return;
 	}
 }

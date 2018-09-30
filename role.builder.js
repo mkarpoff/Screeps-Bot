@@ -10,7 +10,7 @@ const ROLE = 'BUILDER';
 
 module.exports = {
 	spawn: function(spawn) {
-		spawn.spawnCreep([WORK,CARRY,MOVE,MOVE],
+		spawn.spawnCreep([WORK,WORK,CARRY,MOVE],
 			ROLE + Game.time.toString(),
 			{ memory: {
 				role: ROLE,

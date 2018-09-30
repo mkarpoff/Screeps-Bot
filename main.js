@@ -1,22 +1,34 @@
 "use strict";
 
 const HARVESTER = 'HARVESTER';
+const HARVESTER_LD = 'HARVESTER_LD';
 const UPGRADER = 'UPGRADER';
 const BUILDER = 'BUILDER';
 const REPAIRER = 'REPAIRER';
 
+require('prototype.spawn')();
 let roleHarvester = require('role.harvester');
+let roleHarvesterLD = require('role.longDistanceHarvester');
 let roleUpgrader = require('role.upgrader');
 let roleBuilder = require('role.builder');
 let roleRepairer = require('role.repairer');
-let minNumHarvesters = 8;
-let minNumUpgraders = 6;
-let minNumBuilders = 4;
-let minNumRepairers = 4;
+
+let criticalNumHarvesters = 0;
+let minNumHarvesters = 4;
+let minNumUpgraders = 1;
+let minNumBuilders = 1;
+let minNumRepairers = 2;
 
 let resetLoop = false;
+const homeRoom = Game.spawns.Spawn1.room.name;
+let LD_HARVEST_TARGET = {
+	'W8N2': { minNumHarvesters: 2, },
+	'W7N3': { minNumHarvesters: 3, },
+};
+
+//let creepCycle = 0;
+//const maxCreepCycle = 2;
 module.exports.loop = function() {
- 
 	// This reset all the creeps logic protocols so that they can break out of
 	// bad states by unfortunate writes
 	if ( resetLoop ) {
@@ -27,6 +39,13 @@ module.exports.loop = function() {
 		resetLoop = false;
 	}
 
+	deleteDeadCreeps();
+	runCreeps();
+	runTowers();
+	spawnCreeps();
+};
+
+function deleteDeadCreeps() {
 	for (let name in Memory.creeps) {
 		// and checking if the creep is still alive
 		if (Game.creeps[name] == undefined) {
@@ -34,31 +53,77 @@ module.exports.loop = function() {
 			delete Memory.creeps[name];
 		}
 	}
+}
 
+function runCreeps() {
 	for ( let name in Game.creeps ) {
 		let creep = Game.creeps[name];
-		if ( creep.memory.role == HARVESTER ) {
+		if ( creep.spawning ) {
+			continue;
+		}
+		switch( creep.memory.role ) {
+		case HARVESTER:
 			roleHarvester.run(creep);
-		} else if ( creep.memory.role == UPGRADER ) {
+			break;
+		case UPGRADER:
 			roleUpgrader.run(creep);
-		} else if ( creep.memory.role == BUILDER ) {
+			break;
+		case BUILDER:
 			roleBuilder.run(creep);
-		} else if ( creep.memory.role == REPAIRER) {
+			break;
+		case REPAIRER:
 			roleRepairer.run(creep);
+			break;
+		case HARVESTER_LD:
+			roleHarvesterLD.run(creep);
+			break;
+		default:
+			console.log("[ " + creep.name + " ] Unknown role [ " + creep.memory.role + " ]" );
 		}
 	}
-	
+}
+
+function runTowers() {
+	let towers = Game.rooms[homeRoom].find(FIND_STRUCTURES, {
+     filter: (s) => s.structureType == STRUCTURE_TOWER
+	});
+	for (let tower of towers) {
+		let target = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+		if (target != undefined) {
+			tower.attack(target);
+		}
+	}
+}
+
+function spawnCreeps() {
 	let numHarvesters = _.sum( Game.creeps, (c) => c.memory.role == HARVESTER );
 	let numUpgraders = _.sum( Game.creeps, (c) => c.memory.role == UPGRADER );
 	let numBuilders = _.sum( Game.creeps, (c) => c.memory.role == BUILDER );
 	let numRepairers = _.sum( Game.creeps, (c) => c.memory.role == REPAIRER );
+
+	let energy = 1200; 
+	let res;
 	if ( numHarvesters < minNumHarvesters ) {
-		roleHarvester.spawn(Game.spawns.Spawn1);
+		res = Game.spawns.Spawn1.spawnScalingCreep(energy, HARVESTER);
+		if ( res == ERR_NOT_ENOUGH_ENERGY && numHarvesters <= criticalNumHarvesters ) {
+			Game.spawns.Spawn1.spawnScalingCreep(200, HARVESTER);
+		}
 	} else if ( numUpgraders < minNumUpgraders ) {
-		roleUpgrader.spawn(Game.spawns.Spawn1);
+		Game.spawns.Spawn1.spawnScalingCreep(energy, UPGRADER);
 	} else if ( numBuilders < minNumBuilders ) {
-		roleBuilder.spawn(Game.spawns.Spawn1);
+		Game.spawns.Spawn1.spawnScalingCreep(energy, BUILDER);
 	} else if ( numRepairers < minNumRepairers ) {
-		roleRepairer.spawn(Game.spawns.Spawn1);
+		Game.spawns.Spawn1.spawnScalingCreep(energy, REPAIRER);
+	} else {
+		energy = Game.spawns.Spawn1.room.energyCapacityAvailable;
+		for (let room in LD_HARVEST_TARGET ) {
+			numHarvesters = _.sum( Game.creeps,
+				(c) => c.memory.role == HARVESTER_LD
+					&& c.memory.harvestRoomName == room);
+			if ( numHarvesters < LD_HARVEST_TARGET[room].minNumHarvesters ) {
+				Game.spawns.Spawn1.spawnLongDistanceWorker(
+					energy, HARVESTER_LD, 3, homeRoom, room, null);
+			}
+		}
 	}
 }

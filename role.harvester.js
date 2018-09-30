@@ -2,26 +2,12 @@
 let creepBasic = require('creep.basic');
 let roleCollector = require('role.collector');
 
-const COLLECTING = 'COLLECTING';
 const MOVING = 'MOVING';
 const TRANSFER = 'TRANSFER';
-const BUILDING = 'BUILDING';
-const ROLE = 'HARVESTER';
 
 let roleBuilder = require('role.builder');
 
 module.exports = {
-	spawn: function(spawn) {
-		spawn.spawnCreep([WORK,WORK,CARRY,MOVE],
-			ROLE + Game.time.toString(),
-			{ memory: {
-				role: ROLE,
-				task: null,
-				target: null,
-				range: null,
-			}
-		});
-	},
 	
 	run: function(creep) {
 		if (creep.memory.task == null) {
@@ -40,24 +26,28 @@ function determineTask(creep) {
 		return;
 	}
 
-	let closestSpawn = Game.spawns.Spawn1; /* TODO This needs to be the spawn the creep is assigned */
+	let closestStorage = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
+		filter: (s) => ( s.structureType == STRUCTURE_SPAWN 
+			|| s.structureType == STRUCTURE_EXTENSION 
+			|| s.structureType == STRUCTURE_TOWER )
+			&& s.energy < s.energyCapacity });
 	// If the spawn has no more room for energy run the builder protocole
-	if (closestSpawn.energy == closestSpawn.energyCapacity ) {
+	if (closestStorage == undefined ) {
 		roleBuilder.run(creep);
 		return;
 	}
 	
 	// If you're by the spawn transfer energy
-	if ( creep.pos.inRangeTo(closestSpawn, 1) ) {
+	if ( creep.pos.inRangeTo(closestStorage, 1) ) {
 		memory.task = TRANSFER;
-		memory.target = closestSpawn.id
+		memory.target = closestStorage.id;
 		memory.range = 1;
 		return;
 
 	// move to the spawn
 	} else {
 		memory.task = MOVING;
-		memory.target = closestSpawn.id;
+		memory.target = closestStorage.id;
 		memory.range = 1;
 		return;
 	}

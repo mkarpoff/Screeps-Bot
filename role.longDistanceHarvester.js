@@ -50,7 +50,8 @@ function determineTask(creep) {
 
 // Harvester storage code. Might make it place the energy in a container to pass it on
 		let closestStorage = creep.room.storage;
-		if ( closestStorage == undefined ) {
+		if ( closestStorage == undefined || _.sum(closestStorage.store ) == closestStorage.storeCapacity) {
+
 			closestStorage = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
 				filter: (s) => (s.structureType == STRUCTURE_SPAWN 
 					|| s.structureType == STRUCTURE_EXTENSION )

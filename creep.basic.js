@@ -15,120 +15,114 @@ module.exports = {
 
 function performTask(creep) {
 	switch(creep.memory.task) {
-		case null:
-			break;
-		case MOVING:
-			move(creep);
-			break;
-		case MOVING_LD:
-			moveLongDistance(creep);
-			break;
-		case TRANSFER:
-			transfer(creep);
-			break;
-		case COLLECTING:
-			collectEnergy(creep);
-			break;
-		case WITHDRAWING:
-			withdrawEnergy(creep);
-			break;
-		case UPGRADING:
-			upgrade(creep);
-			break;
-		case BUILDING:
-			build(creep);
-			break;
-		case REPAIRING:
-			repair(creep);
-			break;
-		default:
-			console.warn("[creep.basic.js] Unknown task [" + creep.name +"]: " + creep.memory.task);
-			creep.memory.task = null;
+	case null:
+		break;
+	case MOVING:
+		move(creep);
+		break;
+	case MOVING_LD:
+		moveLongDistance(creep);
+		break;
+	case TRANSFER:
+		transfer(creep);
+		break;
+	case COLLECTING:
+		collectEnergy(creep);
+		break;
+	case WITHDRAWING:
+		withdrawEnergy(creep);
+		break;
+	case UPGRADING:
+		upgrade(creep);
+		break;
+	case BUILDING:
+		build(creep);
+		break;
+	case REPAIRING:
+		repair(creep);
+		break;
+	default:
+		console.warn("[creep.basic.js] Unknown task [" + creep.name +"]: " + creep.memory.task);
+		creep.memory.task = null;
 	}
 }
 
 function collectEnergy(creep) {
 	if ( creep.carry.energy == creep.carryCapacity ) {
-		creep.memory.task = null;
-		return;
+		return resetCreep(creep);
 	}
 	let res = creep.harvest(Game.getObjectById(creep.memory.target));
 	if ( res != OK ) {
-		creep.memory.task = null;
+		return resetCreep(creep);
 	}
 }
 
 function withdrawEnergy(creep) {
 	if ( creep.carry.energy == creep.carryCapacity ) {
-		creep.memory.task = null;
-		return;
+		return resetCreep(creep);
 	}
 	let res = creep.withdraw(Game.getObjectById(creep.memory.target), RESOURCE_ENERGY);
 	if ( res != OK ) {
-		creep.memory.task = null;
+		return resetCreep(creep);
 	}
 }
 
 function transfer(creep) {
 	if (creep.carry.energy == 0 ) {
-		creep.memory.task = null;
-		return;
+		return resetCreep(creep);
 	}
 	let res = creep.transfer(Game.getObjectById(creep.memory.target), RESOURCE_ENERGY);
 	if ( res != OK ) {
-		creep.memory.task = null;
+		return resetCreep(creep);
 	}
 }
 
 function upgrade(creep) {
 	if (creep.carry.energy == 0 ) {
-		creep.memory.task = null;
-		return;
+		return resetCreep(creep);
 	}
 	let res = creep.upgradeController(Game.getObjectById(creep.memory.target), RESOURCE_ENERGY);
 	if ( res != OK ) {
-		creep.memory.task = null;
+		return resetCreep(creep);
 	}
 }
 
 function build(creep) {
 	if (creep.carry.energy == 0 ) {
-		creep.memory.task = null;
-		return;
+		return resetCreep(creep);
 	}
 	let res = creep.build(Game.getObjectById(creep.memory.target));
 	if ( res != OK ) {
-		creep.memory.task = null;
+		return resetCreep(creep);
 	}
 }
 
 function repair(creep) {
 	if (creep.carry.energy == 0 ) {
-		creep.memory.task = null;
+		return resetCreep(creep);
 	}
 	let target = Game.getObjectById(creep.memory.target);
 	let res = creep.repair(target);
 	if ( res != OK ) {
-		creep.memory.task = null;
+		return resetCreep(creep);
 	} else if ( target.hits == target.hitsMax ) {
-		creep.memory.task = null;
+		return resetCreep(creep);
 	} else if ( target.structureType == STRUCTURE_WALL || target.structureType == STRUCTURE_RAMPART ) {
-		creep.memory.task = null;
+		return resetCreep(creep);
 	}
 }
 
 function move(creep) {
 	let moveTarget = Game.getObjectById(creep.memory.target);
 	if ( moveTarget == null ) {
-		return;
+		return resetCreep(creep);
 	}
 	if ( creep.pos.inRangeTo(moveTarget, creep.memory.range) ) {
-		creep.memory.task = null;
-		return;
+		return resetCreep(creep);
 	}
 	let ret = creep.moveTo(moveTarget, {reusePath:5});
 	if (ret != OK ) {
-		creep.memory.task = null;
+		return resetCreep(creep);
 	}
 }
 
@@ -151,21 +145,24 @@ function moveLongDistance(creep) {
 			yt = creep.pos.y;
 		}
 		creep.moveTo(xt,yt);
-		creep.memory.task = null;
-		creep.memory.target = null;
-		return;
+		return resetCreep(creep);
 	}
 	let exit = creep.room.findExitTo(creep.memory.target);
 	if ( exit == ERR_NO_PATH ) {
 		console.error("[ " + creep.name + " ] no path to [ " + creep.memory.target + " ]");
-		creep.memory.task = null;
-		return;
+		return resetCreep(creep);
 	}
 	let moveTarget = creep.pos.findClosestByPath(exit);
 	let ret = creep.moveTo(moveTarget, {reusePath:5});
 	if (ret != OK ) {
-		creep.memory.task = null;
-		creep.memory.target = null;
+		return resetCreep(creep);
 	}
 }
+
+function resetCreep(creep) {
+	creep.memory.target = null;
+	creep.memory.task = null;
+	creep.range = null;
+}
+
 

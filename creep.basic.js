@@ -1,13 +1,13 @@
 "use strict";
 
-const COLLECTING = 'COLLECTING';
-const	WITHDRAWING = 'WITHDRAWING';
-const MOVING = 'MOVING';
-const MOVING_LD = 'MOVING_LD';
-const TRANSFER = 'TRANSFER';
-const UPGRADING = 'UPGRADING';
-const REPAIRING = 'REPAIRING';
-const BUILDING = 'BUILDING';
+const COLLECTING = "COLLECTING";
+const	WITHDRAWING = "WITHDRAWING";
+const MOVING = "MOVING";
+const MOVING_LD = "MOVING_LD";
+const TRANSFER = "TRANSFER";
+const UPGRADING = "UPGRADING";
+const REPAIRING = "REPAIRING";
+const BUILDING = "BUILDING";
 
 module.exports = {
 	performTask:performTask,

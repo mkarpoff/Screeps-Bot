@@ -1,12 +1,12 @@
 "use strict";
-let creepBasic = require('creep.basic');
-let roleCollector = require('role.collector');
+let creepBasic = require("creep.basic");
+let roleCollector = require("role.collector");
 
-const MOVING = 'MOVING';
-const MOVING_LD = 'MOVING_LD';
-const TRANSFER = 'TRANSFER';
+const MOVING = "MOVING";
+const MOVING_LD = "MOVING_LD";
+const TRANSFER = "TRANSFER";
 
-let roleBuilder = require('role.builder');
+let roleBuilder = require("role.builder");
 
 module.exports = {
 	run: function(creep) {
@@ -42,13 +42,13 @@ function determineTask(creep) {
 	} else {
 		// move to the right room
 		if ( creep.room.name != memory.homeRoomName ) {
-				memory.task = MOVING_LD;
-				memory.target = creep.memory.homeRoomName;
-				memory.range = 1;
-				return;
+			memory.task = MOVING_LD;
+			memory.target = creep.memory.homeRoomName;
+			memory.range = 1;
+			return;
 		}
 
-// Harvester storage code. Might make it place the energy in a container to pass it on
+		// Harvester storage code. Might make it place the energy in a container to pass it on
 		let closestStorage = creep.room.storage;
 		if ( closestStorage == undefined || _.sum(closestStorage.store ) == closestStorage.storeCapacity) {
 

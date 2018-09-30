@@ -1,13 +1,13 @@
 "use strict";
-let creepBasic = require('creep.basic');
+let creepBasic = require("creep.basic");
 
-const COLLECTING = 'COLLECTING';
-const WITHDRAWING = 'WITHDRAWING';
-const MOVING = 'MOVING';
+const COLLECTING = "COLLECTING";
+const WITHDRAWING = "WITHDRAWING";
+const MOVING = "MOVING";
 module.exports = {
 	run: function(creep) {
 		if ( creep.memory.task == null ) {
-				determineTask(creep);
+			determineTask(creep);
 		}
 		creepBasic.performTask(creep);
 	}
@@ -30,7 +30,7 @@ function determineTask(creep) {
 		} else if ( closestSource.store[RESOURCE_ENERGY] < creep.carryCapacity ) {
 			return;
 		} else {
-			// if you're in range collect energy
+			// if you are in range collect energy
 			if ( creep.pos.inRangeTo(closestSource, 1) ) {
 				memory.task = WITHDRAWING;
 				memory.target = closestSource.id;
@@ -45,7 +45,7 @@ function determineTask(creep) {
 		}
 	}
 
-	// if you're in range collect energy
+	// if you are in range collect energy
 	if ( creep.pos.inRangeTo(closestSource, 1) ) {
 		memory.task = COLLECTING;
 		memory.target = closestSource.id;

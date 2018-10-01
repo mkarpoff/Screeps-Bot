@@ -1,6 +1,5 @@
 "use strict";
 let roleUpgrader = require("role.upgrader");
-let roleCollector = require("role.collector");
 
 const MOVING = "MOVING";
 const BUILDING = "BUILDING";
@@ -19,7 +18,11 @@ function determineTask(creep) {
 	let memory = creep.memory;
 	// If you don't have energy get it first
 	if ( creep.carry.energy == 0 ) {
-		roleCollector.run(creep);
+		if ( Memory.lorryExists == false || creep.room.storage == undefined ) {
+			creep.taskHarvestEnergyFromClosestSource();
+		} else {
+			creep.taskCollectEnergyFromStorage();
+		}
 		return;
 	}
 

@@ -52,9 +52,11 @@ let drawTargets = true;
 module.exports = function() {
 	Creep.prototype.performTask = performTask;
 	Creep.prototype.drawTarget = drawTarget;
+	Creep.prototype.taskCollectEnergyFromStorage = taskCollectEnergyFromStorage;
+	Creep.prototype.taskHarvestEnergyFromClosestSource = taskHarvestEnergyFromClosestSource;
 };
 
-
+/* PROTOTYPE METHODS */
 function drawTarget(creep) {
 	if ( ! drawTargets ) {
 		return;
@@ -68,6 +70,56 @@ function drawTarget(creep) {
 			);
 		}
 	}
+}
+
+
+function taskCollectEnergyFromStorage() {
+	let closestSource = this.room.storage;
+	if ( closestSource == undefined ) {
+		return;
+	} else if ( closestSource.store[RESOURCE_ENERGY] < this.carryCapacity ) {
+		resetCreep(this);
+		return;
+	} else {
+		// if you are in range collect energy
+		if ( this.pos.inRangeTo(closestSource, 1) ) {
+			this.memory.task = WITHDRAWING;
+			this.memory.target = closestSource.id;
+			this.memory.range = 1;
+			return;
+		}
+		// else move closer
+		this.memory.task = MOVING;
+		this.memory.target = closestSource.id;
+		this.memory.range = 1;
+		return;
+	}
+}
+
+function taskHarvestEnergyFromClosestSource() {
+	if ( this.room.find( FIND_SOURCES_ACTIVE ) == null ) {
+		return;
+	}
+	let closestSource = this.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+	if ( closestSource == null ) {
+		closestSource = this.pos.findClosestByRange(FIND_SOURCES_ACTIVE);
+	}
+	if ( closestSource == null ) {
+		resetCreep(this);
+		return;
+	}
+	// if you are in range collect energy
+	if ( this.pos.inRangeTo(closestSource, 1)) {
+		this.memory.task = COLLECTING;
+		this.memory.target = closestSource.id;
+		this.memory.range = 1;
+		return;
+	}
+	// else move closer
+	this.memory.task = MOVING;
+	this.memory.target = closestSource.id;
+	this.memory.range = 1;
+	return;
 }
 
 function performTask(creep) {
@@ -104,6 +156,7 @@ function performTask(creep) {
 	}
 }
 
+/* LOCAL METHODS */
 function collectEnergy(creep) {
 	if ( creep.carry.energy == creep.carryCapacity ) {
 		return resetCreep(creep);

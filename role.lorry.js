@@ -1,7 +1,6 @@
 "use strict";
 
 const MOVING = "MOVING";
-const WITHDRAWING = "WITHDRAWING";
 const TRANSFER = "TRANSFER";
 
 
@@ -23,29 +22,14 @@ function determineTask(creep) {
 		if ( creep.ticksToLive < 30 ) {
 			creep.suicide();
 		}
-		let closestSource = creep.room.storage;
-		if ( closestSource == undefined ) {
-			// No storage but lorry exists
-			console.log("[ " + creep.name + " ] No storage to withdraw from");
-			return;
-		}
-		if ( creep.pos.inRangeTo(closestSource, 1) ) {
-			memory.task = WITHDRAWING;
-			memory.target = closestSource.id;
-			memory.range = 1;
-			return;
-		}
-		// else move closer
-		memory.task = MOVING;
-		memory.target = closestSource.id;
-		memory.range = 1;
+		creep.taskCollectEnergyFromStorage();
 		return;
 	}
 
 
 	let closestStorage = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
-		filter: (s) => ( s.structureType == STRUCTURE_SPAWN 
-			|| s.structureType == STRUCTURE_EXTENSION 
+		filter: (s) => ( s.structureType == STRUCTURE_SPAWN
+			|| s.structureType == STRUCTURE_EXTENSION
 			|| s.structureType == STRUCTURE_TOWER )
 			&& s.energy < s.energyCapacity });
 	if (closestStorage == null ) {

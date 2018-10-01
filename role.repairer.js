@@ -1,6 +1,5 @@
 "use strict";
 let roleBuilder = require("role.builder");
-let roleCollector = require("role.collector");
 
 const MOVING = "MOVING";
 const REPAIRING = "REPAIRING";
@@ -19,7 +18,11 @@ function determineTask(creep) {
 	let memory = creep.memory;
 	// If you don't have energy get it first
 	if ( creep.carry.energy == 0 ) {
-		roleCollector.run(creep);
+		if ( Memory.lorryExists == false || creep.room.storage == undefined ) {
+			creep.taskHarvestEnergyFromClosestSource();
+		} else {
+			creep.taskCollectEnergyFromStorage();
+		}
 		return;
 	}
 
@@ -51,40 +54,40 @@ function determineTask(creep) {
 let priorityMax = 3;
 function needsRepair(struct, i) {
 	switch (i) {
-		case 0:
-			switch (struct.structureType) {
-				case STRUCTURE_WALL:
-				case STRUCTURE_RAMPART:
-					return (struct.hits < 50000);
-				default:
-					return (struct.hits < struct.hitsMax * 0.70);
-			}
-		case 1:
-			switch (struct.structureType) {
-				case STRUCTURE_WALL:
-				case STRUCTURE_RAMPART:
-					return (struct.hits < 100000);
-				default:
-					return (struct.hits < struct.hitsMax * 0.95);
-			}
-		case 2:
-			switch (struct.structureType) {
-				case STRUCTURE_WALL:
-				case STRUCTURE_RAMPART:
-					return (struct.hits < 200000 );
-				default:
-					return (struct.hits < struct.hitsMax);
-			}
-		case 3:
-			switch (struct.structureType) {
-				case STRUCTURE_WALL:
-				case STRUCTURE_RAMPART:
-					return (struct.hits < RAMPART_HITS_MAX[2]);
-				default:
-					return (struct.hits < struct.hitsMax);
-			}
+	case 0:
+		switch (struct.structureType) {
+		case STRUCTURE_WALL:
+		case STRUCTURE_RAMPART:
+			return (struct.hits < 50000);
 		default:
-			return false;
+			return (struct.hits < struct.hitsMax * 0.70);
+		}
+	case 1:
+		switch (struct.structureType) {
+		case STRUCTURE_WALL:
+		case STRUCTURE_RAMPART:
+			return (struct.hits < 100000);
+		default:
+			return (struct.hits < struct.hitsMax * 0.95);
+		}
+	case 2:
+		switch (struct.structureType) {
+		case STRUCTURE_WALL:
+		case STRUCTURE_RAMPART:
+			return (struct.hits < 200000 );
+		default:
+			return (struct.hits < struct.hitsMax);
+		}
+	case 3:
+		switch (struct.structureType) {
+		case STRUCTURE_WALL:
+		case STRUCTURE_RAMPART:
+			return (struct.hits < RAMPART_HITS_MAX[2]);
+		default:
+			return (struct.hits < struct.hitsMax);
+		}
+	default:
+		return false;
 	}
 }
 

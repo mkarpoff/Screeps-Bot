@@ -1,5 +1,4 @@
 "use strict";
-let roleCollector = require("role.collector");
 
 const MOVING = "MOVING";
 const MOVING_LD = "MOVING_LD";
@@ -33,7 +32,7 @@ function determineTask(creep) {
 			memory.range = 1;
 			return;
 		} else {
-			roleCollector.run(creep);
+			creep.taskHarvestEnergyFromClosestSource(this);
 			return;
 		}
 
@@ -61,7 +60,7 @@ function determineTask(creep) {
 			roleBuilder.run(creep);
 			return;
 		}
-		
+
 		// If you're by the spawn transfer energy
 		if ( creep.pos.inRangeTo(closestStorage, 1) ) {
 			memory.task = TRANSFER;

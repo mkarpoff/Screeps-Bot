@@ -1,7 +1,7 @@
 "use strict";
 
 const COLLECTING = "COLLECTING";
-const	WITHDRAWING = "WITHDRAWING";
+const WITHDRAWING = "WITHDRAWING";
 const MOVING = "MOVING";
 const MOVING_LD = "MOVING_LD";
 const TRANSFER = "TRANSFER";
@@ -9,9 +9,71 @@ const UPGRADING = "UPGRADING";
 const REPAIRING = "REPAIRING";
 const BUILDING = "BUILDING";
 
+const TARGET_STYLE = {
+	HARVESTER: {
+		fill: "transparent",
+		radius: 0.15,
+		// Green
+		stroke: "#008000",
+		strokeWidth: 0.05,
+	},
+	REPAIRER: {
+		fill: "transparent",
+		radius: 0.20,
+		// Red
+		stroke: "#FF0000",
+		strokeWidth: 0.05,
+	},
+	UPGRADER: {
+		fill: "transparent",
+		radius: 0.25,
+		// Cyan
+		stroke: "#00FFFF",
+		strokeWidth: 0.05,
+
+	},
+	BUILDER: {
+		fill: "transparent",
+		radius: 0.30,
+		// Blue
+		stroke: "#0000FF",
+		strokeWidth: 0.05,
+	},
+	LORRY: {
+		fill: "transparent",
+		radius: 0.35,
+		// Hot Pink
+		stroke: "#FF1493",
+		strokeWidth: 0.05,
+	},
+
+};
+
+let drawTargets = true;
 module.exports = {
 	performTask:performTask,
+	drawTarget:drawTarget,
 };
+//module.exports = function() {
+//	Creep.prototype.performTask = performTask;
+//	Creep.prototype.drawTarget = drawTarget;
+//};
+
+
+function drawTarget(creep) {
+	if ( ! drawTargets ) {
+		return;
+	}
+	if ( creep.memory.target != null ) {
+		let target = Game.getObjectById(creep.memory.target);
+		if (target != null) {
+			creep.room.visual.circle(
+				target.pos,
+				TARGET_STYLE[creep.memory.role]
+			);
+		}
+	}
+}
 
 function performTask(creep) {
 	switch(creep.memory.task) {
@@ -149,7 +211,7 @@ function moveLongDistance(creep) {
 	}
 	let exit = creep.room.findExitTo(creep.memory.target);
 	if ( exit == ERR_NO_PATH ) {
-		console.error("[ " + creep.name + " ] no path to [ " + creep.memory.target + " ]");
+		console.log("[ " + creep.name + " ] no path to [ " + creep.memory.target + " ]");
 		return resetCreep(creep);
 	}
 	let moveTarget = creep.pos.findClosestByPath(exit);

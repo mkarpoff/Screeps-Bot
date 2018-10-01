@@ -1,36 +1,17 @@
 "use strict";
-let creepBasic = require('creep.basic');
-let roleBuilder = require('role.builder');
-let roleCollector = require('role.collector');
+let creepBasic = require("creep.basic");
+let roleBuilder = require("role.builder");
+let roleCollector = require("role.collector");
 
-const MOVING = 'MOVING';
-const REPAIRING = 'REPAIRING';
-const ROLE = 'REPAIRER';
+const MOVING = "MOVING";
+const REPAIRING = "REPAIRING";
 
 module.exports = {
-	spawn: function(spawn) {
-		spawn.spawnCreep([WORK,WORK,CARRY,MOVE],
-			ROLE + Game.time.toString(),
-			{ memory: {
-				role: ROLE,
-				task: null,
-				target: null,
-				range:null,
-			}
-		});
-	},
-
 	run: function(creep) {
 		if ( creep.memory.task == null ) {
-				determineTask(creep);
+			determineTask(creep);
 		}
-//		if ( creep.memory.target != null ) {
-//			creep.room.visual.circle(Game.getObjectById(creep.memory.target).pos,
-//				{	fill: 'transparent',
-//					radius: 0.40,
-//					stroke: 'red'
-//			});
-//		}
+		creepBasic.drawTarget(creep);
 		creepBasic.performTask(creep);
 	},
 };

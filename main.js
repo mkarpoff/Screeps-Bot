@@ -19,7 +19,7 @@ let roleLorry = require("role.lorry");
 let criticalNumHarvesters = 0;
 let minNumHarvesters = 3;
 let minNumUpgraders = 1;
-let minNumBuilders = 2;
+let minNumBuilders = 1;
 let minNumRepairers = 2;
 let minNumLorrys = 2;
 
@@ -28,7 +28,7 @@ Memory.lorryExists = false;
 const homeRoom = Game.spawns.Spawn1.room.name;
 let LD_HARVEST_TARGET = {
 	"W8N2": { minNumHarvesters: 2, },
-	"W7N3": { minNumHarvesters: 2, },
+	"W7N3": { minNumHarvesters: 3, },
 };
 
 module.exports.loop = function() {
@@ -56,7 +56,7 @@ function spawnCreeps() {
 	let numLorrys = _.sum( Game.creeps, (c) => c.memory.role == LORRY );
 	Memory.lorryExists = numLorrys > 0;
 
-	let energy = 1200; 
+	let energy = 1000; 
 	let res;
 	if ( numHarvesters < minNumHarvesters ) {
 		res = Game.spawns.Spawn1.spawnScalingCreep(energy, HARVESTER);

@@ -24,8 +24,8 @@ module.exports = function() {
 			body.fill(WORK, 0,numWorkParts);
 			body.fill(CARRY, numWorkParts, numWorkParts + numParts);
 			body.fill(MOVE, numWorkParts + numParts);
-			return this.spawnCreep(body, role + "_" + harvestRoomName + "_" + Game.time.toString(), { 
-				memory: { 
+			return this.spawnCreep(body, role + "_" + harvestRoomName + "_" + Game.time.toString(), {
+				memory: {
 					role: role,
 					task: null,
 					target: null,
@@ -37,9 +37,9 @@ module.exports = function() {
 		};
 	StructureSpawn.prototype.spawnLorryCreep =
 		function(energyMax, role) {
-			let numParts = Math.floor(energyMax / 100);
-			let body = Array(numParts*2);
-			body.fill(CARRY, 0, numParts);
+			let numParts = Math.floor(energyMax / 150);
+			let body = Array(numParts*3);
+			body.fill(CARRY, 0, 2*numParts);
 			body.fill(MOVE, numParts);
 			return this.spawnCreep(body, role + "_" + Game.time.toString(), {
 				memory: {

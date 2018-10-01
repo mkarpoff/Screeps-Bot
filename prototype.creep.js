@@ -1,5 +1,19 @@
 "use strict";
 
+let roleHarvester = require("role.harvester");
+let roleHarvesterLD = require("role.longDistanceHarvester");
+let roleUpgrader = require("role.upgrader");
+let roleBuilder = require("role.builder");
+let roleRepairer = require("role.repairer");
+let roleLorry = require("role.lorry");
+
+const HARVESTER = "HARVESTER";
+const HARVESTER_LD = "HARVESTER_LD";
+const UPGRADER = "UPGRADER";
+const BUILDER = "BUILDER";
+const REPAIRER = "REPAIRER";
+const LORRY = "LORRY";
+
 const COLLECTING = "COLLECTING";
 const WITHDRAWING = "WITHDRAWING";
 const MOVING = "MOVING";
@@ -54,6 +68,7 @@ module.exports = function() {
 	Creep.prototype.drawTarget = drawTarget;
 	Creep.prototype.taskCollectEnergyFromStorage = taskCollectEnergyFromStorage;
 	Creep.prototype.taskHarvestEnergyFromClosestSource = taskHarvestEnergyFromClosestSource;
+	Creep.prototype.runCreep = runCreep;
 };
 
 /* PROTOTYPE METHODS */
@@ -153,6 +168,34 @@ function performTask(creep) {
 	default:
 		console.warn("[creep.basic.js] Unknown task [" + creep.name +"]: " + creep.memory.task);
 		creep.memory.task = null;
+	}
+}
+
+function runCreep() {
+	if ( this.spawning ) {
+		return;
+	}
+	switch( this.memory.role ) {
+	case HARVESTER:
+		roleHarvester.run(this);
+		break;
+	case UPGRADER:
+		roleUpgrader.run(this);
+		break;
+	case BUILDER:
+		roleBuilder.run(this);
+		break;
+	case REPAIRER:
+		roleRepairer.run(this);
+		break;
+	case HARVESTER_LD:
+		roleHarvesterLD.run(this);
+		break;
+	case LORRY:
+		roleLorry.run(this);
+		break;
+	default:
+		console.log("[ " + this.name + " ] Unknown role [ " + this.memory.role + " ]" );
 	}
 }
 

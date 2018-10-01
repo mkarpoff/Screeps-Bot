@@ -9,12 +9,6 @@ const LORRY = "LORRY";
 
 require("prototype.spawn")();
 require("prototype.creep")();
-let roleHarvester = require("role.harvester");
-let roleHarvesterLD = require("role.longDistanceHarvester");
-let roleUpgrader = require("role.upgrader");
-let roleBuilder = require("role.builder");
-let roleRepairer = require("role.repairer");
-let roleLorry = require("role.lorry");
 
 let criticalNumHarvesters = 0;
 let minNumHarvesters = 3;
@@ -56,7 +50,7 @@ function spawnCreeps() {
 	let numLorrys = _.sum( Game.creeps, (c) => c.memory.role == LORRY );
 	Memory.lorryExists = numLorrys > 0;
 
-	let energy = 1000; 
+	let energy = 1000;
 	let res;
 	if ( numHarvesters < minNumHarvesters ) {
 		res = Game.spawns.Spawn1.spawnScalingCreep(energy, HARVESTER);
@@ -97,32 +91,7 @@ function deleteDeadCreeps() {
 
 function runCreeps() {
 	for ( let name in Game.creeps ) {
-		let creep = Game.creeps[name];
-		if ( creep.spawning ) {
-			continue;
-		}
-		switch( creep.memory.role ) {
-		case HARVESTER:
-			roleHarvester.run(creep);
-			break;
-		case UPGRADER:
-			roleUpgrader.run(creep);
-			break;
-		case BUILDER:
-			roleBuilder.run(creep);
-			break;
-		case REPAIRER:
-			roleRepairer.run(creep);
-			break;
-		case HARVESTER_LD:
-			roleHarvesterLD.run(creep);
-			break;
-		case LORRY:
-			roleLorry.run(creep);
-			break;
-		default:
-			console.log("[ " + creep.name + " ] Unknown role [ " + creep.memory.role + " ]" );
-		}
+		Game.creeps[name].runCreep();
 	}
 }
 

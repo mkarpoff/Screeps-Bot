@@ -14,9 +14,8 @@ module.exports = function() {
 					task: null,
 					target: null,
 					range: null,
-			}});
+				}});
 		};
-
 	StructureSpawn.prototype.spawnLongDistanceWorker =
 		function(energyMax, role, numWorkParts, homeRoomName, harvestRoomName, harvestSource) {
 
@@ -34,6 +33,20 @@ module.exports = function() {
 					harvestRoomName: harvestRoomName,
 					harvestSource: harvestSource,
 					homeRoomName: homeRoomName,
-			}});
+				}});
+		};
+	StructureSpawn.prototype.spawnLorryCreep =
+		function(energyMax, role) {
+			let numParts = Math.floor(energyMax / 100);
+			let body = Array(numParts*2);
+			body.fill(CARRY, 0, numParts);
+			body.fill(MOVE, numParts);
+			return this.spawnCreep(body, role + "_" + Game.time.toString(), {
+				memory: {
+					role: role,
+					task: null,
+					target: null,
+					range: null,
+				}});
 		};
 };

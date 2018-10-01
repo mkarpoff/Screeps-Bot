@@ -18,12 +18,15 @@ function determineTask(creep) {
 		creep.suicide();
 	}
 	let memory = creep.memory;
-	let closestSource = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
-	if (closestSource == null ) {
-		closestSource = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE);
+	let closestSource = null;
+	if ( Memory.lorryExists == false || creep.room.storage == undefined ) {
+		closestSource = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+		if ( closestSource == null ) {
+			closestSource = creep.pos.findClosestByRange(FIND_SOURCES_ACTIVE);
+		}
 	}
 	// There are no more sources with reasources check in storage
-	if (closestSource == null ) {
+	if ( closestSource == null ) {
 		closestSource = creep.room.storage;
 		if ( closestSource == undefined ) {
 			return;
@@ -46,7 +49,7 @@ function determineTask(creep) {
 	}
 
 	// if you are in range collect energy
-	if ( creep.pos.inRangeTo(closestSource, 1) ) {
+	if ( creep.pos.inRangeTo(closestSource, 1) && creep.room.storage == undefined) {
 		memory.task = COLLECTING;
 		memory.target = closestSource.id;
 		memory.range = 1;

@@ -8,6 +8,7 @@ const REPAIRER = "REPAIRER";
 const LORRY = "LORRY";
 
 require("prototype.spawn")();
+require("prototype.creep")();
 let roleHarvester = require("role.harvester");
 let roleHarvesterLD = require("role.longDistanceHarvester");
 let roleUpgrader = require("role.upgrader");

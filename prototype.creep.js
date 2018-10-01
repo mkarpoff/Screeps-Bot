@@ -46,18 +46,13 @@ const TARGET_STYLE = {
 		stroke: "#FF1493",
 		strokeWidth: 0.05,
 	},
-
 };
 
 let drawTargets = true;
-module.exports = {
-	performTask:performTask,
-	drawTarget:drawTarget,
+module.exports = function() {
+	Creep.prototype.performTask = performTask;
+	Creep.prototype.drawTarget = drawTarget;
 };
-//module.exports = function() {
-//	Creep.prototype.performTask = performTask;
-//	Creep.prototype.drawTarget = drawTarget;
-//};
 
 
 function drawTarget(creep) {

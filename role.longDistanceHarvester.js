@@ -1,5 +1,4 @@
 "use strict";
-let creepBasic = require("creep.basic");
 let roleCollector = require("role.collector");
 
 const MOVING = "MOVING";
@@ -13,7 +12,7 @@ module.exports = {
 		if (creep.memory.task == null) {
 			determineTask(creep);
 		}
-		creepBasic.performTask(creep);
+		creep.performTask(creep);
 	},
 };
 
@@ -53,7 +52,7 @@ function determineTask(creep) {
 		if ( closestStorage == undefined || _.sum(closestStorage.store ) == closestStorage.storeCapacity) {
 
 			closestStorage = creep.pos.findClosestByPath(FIND_MY_STRUCTURES, {
-				filter: (s) => (s.structureType == STRUCTURE_SPAWN 
+				filter: (s) => (s.structureType == STRUCTURE_SPAWN
 					|| s.structureType == STRUCTURE_EXTENSION )
 					&& s.energy < s.energyCapacity });
 		}

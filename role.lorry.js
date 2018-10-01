@@ -1,5 +1,4 @@
 "use strict";
-let creepBasic = require("creep.basic");
 
 const MOVING = "MOVING";
 const WITHDRAWING = "WITHDRAWING";
@@ -11,8 +10,8 @@ module.exports = {
 		if (creep.memory.task == null) {
 			determineTask(creep);
 		}
-		creepBasic.drawTarget(creep);
-		creepBasic.performTask(creep);
+		creep.drawTarget(creep);
+		creep.performTask(creep);
 	},
 };
 

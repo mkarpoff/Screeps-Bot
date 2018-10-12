@@ -1,29 +1,15 @@
 "use strict";
 
-const HARVESTER = "HARVESTER";
-const HARVESTER_LD = "HARVESTER_LD";
-const UPGRADER = "UPGRADER";
-const BUILDER = "BUILDER";
-const REPAIRER = "REPAIRER";
-const LORRY = "LORRY";
-
 require("prototype.spawn")();
 require("prototype.creep")();
-
-let criticalNumHarvesters = 0;
-let minNumHarvesters = 3;
-let minNumUpgraders = 1;
-let minNumBuilders = 1;
-let minNumRepairers = 2;
-let minNumLorrys = 2;
+require("prototype.tower")();
 
 Memory.resetLoop = false;
 Memory.lorryExists = false;
-const homeRoom = Game.spawns.Spawn1.room.name;
-let LD_HARVEST_TARGET = {
-	"W8N2": { minNumHarvesters: 2, },
-	"W7N3": { minNumHarvesters: 3, },
-};
+Memory.towerExists = false;
+if ( Memory.drawTargets == undefined ) {
+	Memory.drawTargets = true;
+}
 
 module.exports.loop = function() {
 	// This reset all the creeps logic protocols so that they can break out of
@@ -43,39 +29,8 @@ module.exports.loop = function() {
 };
 
 function spawnCreeps() {
-	let numHarvesters = _.sum( Game.creeps, (c) => c.memory.role == HARVESTER );
-	let numUpgraders = _.sum( Game.creeps, (c) => c.memory.role == UPGRADER );
-	let numBuilders = _.sum( Game.creeps, (c) => c.memory.role == BUILDER );
-	let numRepairers = _.sum( Game.creeps, (c) => c.memory.role == REPAIRER );
-	let numLorrys = _.sum( Game.creeps, (c) => c.memory.role == LORRY );
-	Memory.lorryExists = numLorrys > 0;
-
-	let energy = 1000;
-	let res;
-	if ( numHarvesters < minNumHarvesters ) {
-		res = Game.spawns.Spawn1.spawnScalingCreep(energy, HARVESTER);
-		if ( res == ERR_NOT_ENOUGH_ENERGY && numHarvesters <= criticalNumHarvesters ) {
-			Game.spawns.Spawn1.spawnScalingCreep(200, HARVESTER);
-		}
-	} else if ( numUpgraders < minNumUpgraders ) {
-		Game.spawns.Spawn1.spawnScalingCreep(energy, UPGRADER);
-	} else if ( numBuilders < minNumBuilders ) {
-		Game.spawns.Spawn1.spawnScalingCreep(energy, BUILDER);
-	} else if ( numRepairers < minNumRepairers ) {
-		Game.spawns.Spawn1.spawnScalingCreep(energy, REPAIRER);
-	} else if ( numLorrys < minNumLorrys && Game.spawns.Spawn1.room.storage != undefined ) {
-		Game.spawns.Spawn1.spawnLorryCreep(energy, LORRY);
-	} else {
-		energy = Game.spawns.Spawn1.room.energyCapacityAvailable;
-		for (let room in LD_HARVEST_TARGET ) {
-			numHarvesters = _.sum( Game.creeps,
-				(c) => c.memory.role == HARVESTER_LD
-					&& c.memory.harvestRoomName == room);
-			if ( numHarvesters < LD_HARVEST_TARGET[room].minNumHarvesters ) {
-				Game.spawns.Spawn1.spawnLongDistanceWorker(
-					energy, HARVESTER_LD, 3, homeRoom, room, null);
-			}
-		}
+	for (let spawn in Game.spawns ) {
+		Game.spawns[spawn].runSpawn();
 	}
 }
 
@@ -96,14 +51,11 @@ function runCreeps() {
 }
 
 function runTowers() {
-	let towers = Game.rooms[homeRoom].find(FIND_STRUCTURES, {
+	let towers = Game.rooms["W8N3"].find(FIND_STRUCTURES, {
 		filter: (s) => s.structureType == STRUCTURE_TOWER
 	});
 	for (let tower of towers) {
-		let target = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-		if (target != undefined) {
-			tower.attack(target);
-		}
+		tower.runTower();
 	}
 }
 
